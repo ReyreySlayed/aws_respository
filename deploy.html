@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌈 Amazing Rainbow Facts</title>
+    <link rel="stylesheet" href="deploy.css">
+</head>
+
+<body>
+    <header>
+        <h1 class="rainbow-text">The World of Rainbows 🌈</h1>
+        <p>A beautiful phenomenon of light and water.</p>
+    </header>
+
+    <main>
+        <section id="basics">
+            <h2>What is a Rainbow?</h2>
+            <p>A rainbow is a meteorological phenomenon that is caused by reflection, refraction and dispersion of light
+                in water droplets resulting in a spectrum of light appearing in the sky. It takes the form of a
+                multicoloured arc.</p>
+        </section>
+
+        <section id="colors">
+            <h2>The Seven Colors (ROYGBIV)</h2>
+            <ul id="color-list">
+                <li style="color: red;">Red</li>
+                <li style="color: orange;">Orange</li>
+                <li style="color: gold;">Yellow</li>
+                <li style="color: green;">Green</li>
+                <li style="color: blue;">Blue</li>
+                <li style="color: indigo;">Indigo</li>
+                <li style="color: violet;">Violet</li>
+            </ul>
+        </section>
+
+        <section id="facts">
+            <h2>Fun Facts</h2>
+            <div id="fact-display">
+                <p id="current-fact">Click the button to reveal a rainbow fact!</p>
+                <button onclick="displayRandomFact()">New Fact</button>
+            </div>
+
+        </section>
+
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Rainbow Facts Website</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+<script>
+    const facts = [
+        "You can only see a full circular rainbow from a plane; from the ground, we only see the arc.",
+        "The sequence of colors is always the same: Red, Orange, Yellow, Green, Blue, Indigo, and Violet (ROYGBIV).",
+        "A rainbow doesn't actually exist in a specific place; its apparent position depends on the viewer's light source (the sun).",
+        "Double rainbows occur when light is reflected twice inside the water droplet, with the second arc having its colors reversed.",
+        "No two people see the exact same rainbow because everyone has a different angle of observation."
+    ];
+
+    function displayRandomFact() {
+        const randomIndex = Math.floor(Math.random() * facts.length);
+        document.getElementById('current-fact').textContent = facts[randomIndex];
+    }
+
+    // Display the first fact when the page loads
+    window.onload = displayRandomFact;
+
+</script>
+
+</html>

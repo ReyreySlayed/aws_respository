@@ -1,0 +1,105 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f0f8ff;
+    /* Light blue background */
+    color: #333;
+    line-height: 1.6;
+    text-align: center;
+}
+
+header {
+    background-color: #ffffff;
+    padding: 20px 0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.rainbow-text {
+    font-size: 3em;
+    /* Creating a rainbow gradient for the text */
+    background: linear-gradient(to right,
+            red,
+            orange,
+            yellow,
+            green,
+            blue,
+            indigo,
+            violet);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    color: transparent;
+    /* Fallback for browsers that don't support clipping */
+}
+
+main {
+    max-width: 900px;
+    margin: 20px auto;
+    padding: 0 20px;
+}
+
+section {
+    background-color: #fff;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    text-align: left;
+}
+
+h2 {
+    color: #6a0dad;
+    /* Deep violet */
+    border-bottom: 2px solid #ddd;
+    padding-bottom: 10px;
+}
+
+#color-list {
+    list-style: none;
+    padding: 0;
+    font-size: 1.1em;
+}
+
+#color-list li {
+    padding: 5px 0;
+    font-weight: bold;
+}
+
+#fact-display {
+    text-align: center;
+}
+
+#current-fact {
+    background-color: #e6e6fa;
+    /* Lavender */
+    padding: 15px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    font-style: italic;
+}
+
+button {
+    background-color: #4682b4;
+    /* Steel blue */
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1em;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: #5f9ea0;
+    /* Cadet blue */
+}
+
+footer {
+    padding: 10px 0;
+    background-color: #333;
+    color: white;
+    font-size: 0.9em;
+    margin-top: 20px;
+}
