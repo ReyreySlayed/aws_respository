@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Shopping Cart</title>
+    <link href="https://fonts.googleapis.com/css2?family=Antonio:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Anton+SC&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="CartDesign.css" />
+</head>
+
+<body>
+
+    <header class="page-header">
+        <h1 class="page-title">Shopping Cart</h1>
+        <nav class="main-nav">
+            <a href="prototypeProductPage.html">Product</a>
+            <a href="cart.html" class="active-link">Cart</a>
+        </nav>
+    </header>
+
+    <div class="cart-container" id="cartContainer">
+        <div class="cart-row cart-header">
+            <div class="col-edit" id="editHeader">EDIT</div>
+            <div class="col-product">Product</div>
+            <div class="col-price">Price</div>
+            <div class="col-qty">Quantity</div>
+            <div class="col-subtotal">Subtotal</div>
+        </div>
+
+        <div class="cart-scroll" id="cartItems">
+        </div>
+    </div>
+
+
+    <div class="checkout-container">
+        <div class="checkout-scroll" id="checkoutItems">
+            <h2 class="checkout-header">CHECKOUT</h2>
+
+            <div class="checkout-section user-info">
+                <div class="info-content">
+                    <div class="name-phone">
+                        <span id="userName">**Firstname Lastname**</span>
+                        <span id="userPhone">(+63)0000000000</span>
+                    </div>
+                    <div class="address-line" id="userAddress">**Street, Barangay, City, Zip Code**</div>
+                </div>
+                <a href="#" class="edit-link" id="editAddressLink"> > </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="deleteModal">
+        <div class="modal-content">
+            <h3 class="modal-header">Confirm Deletion</h3>
+            <p id="modalMessage">Are you sure you want to delete the selected item(s)?</p>
+            <div class="modal-actions">
+                <button id="cancelDelete" class="btn btn-cancel">Cancel</button>
+                <button id="confirmDelete" class="btn btn-delete">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const CART_STORAGE_KEY = 'prototypeCart';
+        const cartItemsContainer = document.getElementById('cartItems');
+        const editHeader = document.getElementById('editHeader');
+        const cartContainer = document.getElementById('cartContainer');
+
+        // MODAL ELEMENTS
+        const deleteModal = document.getElementById('deleteModal');
+        const modalMessage = document.getElementById('modalMessage');
+        const confirmDeleteButton = document.getElementById('confirmDelete');
+        const cancelDeleteButton = document.getElementById('cancelDelete');
+
+        // SUMMARY DISPLAY FIELDS
+        const summaryName = document.getElementById('userName');
+        const summaryPhone = document.getElementById('userPhone');
+        const summaryAddress = document.getElementById('userAddress');
+
+        let isEditMode = false;
+        let itemsToDelete = [];
+
+        // ------------------------------------------------------------------
+        // 🏠 ADDRESS DATA (Set to Universal Default/Empty State)
+        // ------------------------------------------------------------------
+
+        // Default User data model (for initial render/empty state)
+        let userData = {
+            firstname: 'Firstname',
+            lastname: 'Lastname',
+            phone: '0000000000',
+            fullAddress: 'Street, Barangay, City, Zip Code'
+        };
+
+        /**
+         * Updates the summary view with the current userData.
+         */
+        function renderSummaryData() {
+            // Displaying the universal default text from the userData model
+            summaryName.textContent = `${userData.firstname} ${userData.lastname}`;
+            summaryPhone.textContent = `(+63)${userData.phone}`;
+            summaryAddress.textContent = `${userData.fullAddress}`;
+        }
+
+
+        // Helper function to format the price string to a number
+        function parsePrice(priceString) {
+            return parseFloat(priceString.replace('$', ''));
+        }
+
+        // ------------------------------------------------------------------
+        // 🛠️ DELETE MODAL LOGIC
+        // ------------------------------------------------------------------
+
+        /**
+         * Shows the custom modal with the number of selected items.
+         */
+        function showDeleteModal(count) {
+            modalMessage.textContent = `Are you sure you want to delete ${count} item(s)?`;
+            deleteModal.style.display = 'flex';
+
+            setTimeout(() => {
+                deleteModal.classList.add('show');
+            }, 10);
+        }
+
+        /**
+         * Hides the custom modal.
+         */
+        function hideDeleteModal() {
+            deleteModal.classList.remove('show');
+
+            setTimeout(() => {
+                deleteModal.style.display = 'none';
+            }, 300);
+        }
+
+        // ------------------------------------------------------------------
+        // 🛠️ EDIT MODE LOGIC (Updated to use modal)
+        // ------------------------------------------------------------------
+
+        /**
+         * Updates the text and functionality of the 'Edit Header' button (EDIT/BACK/DELETE).
+         */
+        function updateEditHeaderState() {
+            if (!isEditMode) {
+                editHeader.textContent = 'EDIT';
+                cartContainer.classList.remove('edit-mode');
+                return;
+            }
+
+            const selectedCount = document.querySelectorAll('.item-selector input[type="checkbox"]:checked').length;
+
+            if (selectedCount > 0) {
+                editHeader.textContent = 'DELETE';
+            } else {
+                editHeader.textContent = 'BACK';
+            }
+        }
+
+        /**
+         * Handles the click event on the top-left EDIT/BACK/DELETE header.
+         */
+        function handleEditHeaderClick() {
+            const action = editHeader.textContent;
+            const selectedCheckboxes = document.querySelectorAll('.item-selector input[type="checkbox"]');
+
+            if (action === 'EDIT') {
+                isEditMode = true;
+                selectedCheckboxes.forEach(cb => cb.checked = false);
+                cartContainer.classList.add('edit-mode');
+                updateEditHeaderState();
+
+            } else if (action === 'BACK') {
+                isEditMode = false;
+                selectedCheckboxes.forEach(cb => cb.checked = false);
+                cartContainer.classList.remove('edit-mode');
+                updateEditHeaderState();
+
+            } else if (action === 'DELETE') {
+                const checkedCheckboxes = document.querySelectorAll('.item-selector input[type="checkbox"]:checked');
+                itemsToDelete = Array.from(checkedCheckboxes).map(cb => cb.dataset.productId);
+
+                if (itemsToDelete.length > 0) {
+                    showDeleteModal(itemsToDelete.length);
+                }
+            }
+        }
+
+        /**
+         * Deletes all selected items from the cart based on itemsToDelete array.
+         */
+        function deleteSelectedItems() {
+            if (itemsToDelete.length === 0) return;
+
+            let cart = JSON.parse(localStorage.getItem(CART_STORAGE_KEY)) || [];
+
+            cart = cart.filter(item => !itemsToDelete.includes(item.id));
+
+            localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cart));
+
+            itemsToDelete = [];
+            isEditMode = false;
+            renderCart();
+        }
+
+        // ------------------------------------------------------------------
+        // 🛒 CART RENDERING & UPDATING (Carried over)
+        // ------------------------------------------------------------------
+
+        function renderCart() {
+            const cart = JSON.parse(localStorage.getItem(CART_STORAGE_KEY)) || [];
+            cartItemsContainer.innerHTML = '';
+
+            updateEditHeaderState();
+
+            if (cart.length === 0) {
+                cartItemsContainer.innerHTML = '<p style="color: #ccc; padding: 20px; text-align: center;">Your cart is empty.</p>';
+                return;
+            }
+
+            cart.forEach((item) => {
+                const priceValue = parsePrice(item.price);
+                const subtotalValue = priceValue * item.quantity;
+                const subtotalFormatted = `$${subtotalValue.toFixed(2)}`;
+
+                const itemElement = document.createElement('div');
+                itemElement.classList.add('cart-item');
+                itemElement.dataset.productId = item.id;
+
+                itemElement.innerHTML = `
+                <div class="item-selector">
+                    <input type="checkbox" name="selected-item" id="select-${item.id}" data-product-id="${item.id}" class="select-checkbox">
+                </div>
+                <div class="cart-item-details">
+                    <div class="item-image"></div>
+                    <span class="item-name">${item.name}</span>
+                </div>
+                <div class="item-price">${item.price}</div>
+                <div class="item-quantity">
+                    <input type="number" value="${item.quantity}" min="1" data-product-id="${item.id}" class="qty-input">
+                </div>
+                <div class="item-subtotal" id="subtotal-${item.id}">${subtotalFormatted}</div>
+            `;
+
+                cartItemsContainer.appendChild(itemElement);
+            });
+
+            addQuantityListeners();
+            addSelectionListeners();
+        }
+
+        function updateCartItem(productId, newQuantity) {
+            let cart = JSON.parse(localStorage.getItem(CART_STORAGE_KEY)) || [];
+            const itemIndex = cart.findIndex(item => item.id === productId);
+
+            if (itemIndex > -1) {
+                const item = cart[itemIndex];
+                item.quantity = parseInt(newQuantity);
+
+                const priceValue = parsePrice(item.price);
+                const newSubtotal = priceValue * item.quantity;
+                document.getElementById(`subtotal-${productId}`).textContent = `$${newSubtotal.toFixed(2)}`;
+
+                localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cart));
+            }
+        }
+
+        function addQuantityListeners() {
+            document.querySelectorAll('.qty-input').forEach(input => {
+                input.addEventListener('change', function () {
+                    let newQty = parseInt(this.value);
+                    const productId = this.dataset.productId;
+
+                    if (newQty < 1 || isNaN(newQty)) {
+                        newQty = 1;
+                        this.value = 1;
+                    }
+
+                    updateCartItem(productId, newQty);
+                });
+            });
+        }
+
+        function addSelectionListeners() {
+            document.querySelectorAll('.select-checkbox').forEach(input => {
+                input.addEventListener('change', updateEditHeaderState);
+            });
+        }
+
+
+        // --- Initialization & Event Listeners ---
+        document.addEventListener('DOMContentLoaded', () => {
+            renderCart();
+            editHeader.addEventListener('click', handleEditHeaderClick);
+
+            // MODAL CONFIRMATION HANDLERS
+            confirmDeleteButton.addEventListener('click', () => {
+                hideDeleteModal();
+                deleteSelectedItems();
+            });
+
+            cancelDeleteButton.addEventListener('click', hideDeleteModal);
+
+            // 💡 NEW: Render the initial universal default data
+            renderSummaryData();
+        });
+    </script>
+
+</body>
+
+</html>
